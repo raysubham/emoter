@@ -1,6 +1,7 @@
 import { useUser } from "@clerk/nextjs";
 import Image from "next/image";
 import { useState } from "react";
+import { toast } from "react-hot-toast";
 import { api } from "~/utils/api";
 
 export const CreatePostWizard = () => {
@@ -17,6 +18,14 @@ export const CreatePostWizard = () => {
           onSuccess: () => {
             void apiCtx.posts.getAll.invalidate();
             setContent("");
+          },
+          onError: (error) => {
+            const errorMessage = error.data?.zodError?.fieldErrors;
+            if (errorMessage?.content && errorMessage.content?.[0]) {
+              toast.error(errorMessage.content?.[0]);
+            } else {
+              toast.error("Something went wrong. Please try again later.");
+            }
           },
         }
       );
@@ -41,9 +50,15 @@ export const CreatePostWizard = () => {
           onChange={(e) => setContent(e.target.value)}
           disabled={isPosting}
         />
-        <button className="font-semibold" onClick={handleSubmit}>
-          Post
-        </button>
+        {content.length && (
+          <button
+            className="font-semibold"
+            onClick={handleSubmit}
+            disabled={isPosting}
+          >
+            {isPosting ? "Posting..." : "Post"}
+          </button>
+        )}
       </div>
     );
   }
