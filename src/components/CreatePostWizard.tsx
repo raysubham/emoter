@@ -3,6 +3,7 @@ import Image from "next/image";
 import { useState } from "react";
 import { toast } from "react-hot-toast";
 import { api } from "~/utils/api";
+import { LoadingSpinner } from "~/components/LoadingSpinner";
 
 export const CreatePostWizard = () => {
   const [content, setContent] = useState<string>("");
@@ -50,15 +51,12 @@ export const CreatePostWizard = () => {
           onChange={(e) => setContent(e.target.value)}
           disabled={isPosting}
         />
-        {content.length && (
-          <button
-            className="font-semibold"
-            onClick={handleSubmit}
-            disabled={isPosting}
-          >
-            {isPosting ? "Posting..." : "Post"}
+        {!isPosting && Boolean(content) && (
+          <button className="font-semibold" onClick={handleSubmit}>
+            Post
           </button>
         )}
+        {isPosting && <LoadingSpinner size={20} />}
       </div>
     );
   }
