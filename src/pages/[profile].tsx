@@ -10,7 +10,7 @@ import { useRouter } from "next/router";
 const ProfilePage: NextPage = () => {
   const router = useRouter();
   const profile = router.query?.profile as string;
-  const username = profile.replace("@", "");
+  const username = profile?.replace("@", "");
 
   const { data, isLoading } = api.profile.getUserByUsername.useQuery({
     username,
@@ -50,9 +50,9 @@ const ProfilePage: NextPage = () => {
         </div>
         <div className="mt-6 border-b border-slate-400" />
 
-        <div className="flex flex-col">
+        <div className="flex h-full flex-col">
           {isLoadingPosts && (
-            <div className="h-full">
+            <div className="flex h-full items-center justify-center">
               <LoadingSpinner size={40} />
             </div>
           )}
