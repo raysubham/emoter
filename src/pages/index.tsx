@@ -15,7 +15,7 @@ const Home: NextPage = () => {
   if (isLoading)
     return (
       <div className="h-screen">
-        <LoadingSpinner />
+        <LoadingSpinner size={60} />
       </div>
     );
   if (!data?.length) return <div>No posts yet</div>;
