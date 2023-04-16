@@ -1,12 +1,10 @@
-import { NextPage } from "next";
+import { type NextPage } from "next";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import { RouterOutputs, api } from "~/utils/api";
+import { api } from "~/utils/api";
 import { PostView } from "~/components/PostView";
 import { LoadingSpinner } from "~/components/LoadingSpinner";
 import { PageLayout } from "../../components/PageLayout";
-
-type PostType = RouterOutputs["posts"]["getById"];
 
 const PostPage: NextPage = () => {
   const router = useRouter();
