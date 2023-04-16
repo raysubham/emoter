@@ -6,12 +6,18 @@ import Link from "next/link";
 import { api } from "~/utils/api";
 import { CreatePostWizard } from "~/components/CreatePostWizard";
 import { PostView } from "../components/PostView";
+import { LoadingSpinner } from "~/components/LoadingSpinner";
 
 const Home: NextPage = () => {
   const user = useUser();
   const { data, isLoading } = api.posts.getAll.useQuery();
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading)
+    return (
+      <div className="h-screen">
+        <LoadingSpinner />
+      </div>
+    );
   if (!data?.length) return <div>No posts yet</div>;
 
   return (
