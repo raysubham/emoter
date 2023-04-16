@@ -6,19 +6,21 @@ import { api } from "~/utils/api";
 import { LoadingSpinner } from "~/components/LoadingSpinner";
 
 export const CreatePostWizard = () => {
-  const [content, setContent] = useState<string>("");
+  const [contentText, setContentText] = useState<string>("");
   const user = useUser();
   const { mutate, isLoading: isPosting } = api.posts.create.useMutation();
   const apiCtx = api.useContext();
 
-  const handleSubmit = () => {
-    if (content.length > 0) {
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (contentText.length > 0) {
       mutate(
-        { content },
+        { content: contentText },
         {
           onSuccess: () => {
             void apiCtx.posts.getAll.invalidate();
-            setContent("");
+            setContentText("");
           },
           onError: (error) => {
             const errorMessage = error.data?.zodError?.fieldErrors;
@@ -43,20 +45,29 @@ export const CreatePostWizard = () => {
           width={48}
           height={48}
         />
-        <input
-          placeholder="What's on your mind?"
-          className="grow bg-transparent outline-none"
-          type="text"
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          disabled={isPosting}
-        />
-        {!isPosting && Boolean(content) && (
-          <button className="font-semibold" onClick={handleSubmit}>
-            Post
-          </button>
-        )}
-        {isPosting && <LoadingSpinner size={20} />}
+        <form
+          onSubmit={handleSubmit}
+          className="flex w-full items-center justify-center"
+        >
+          <input
+            placeholder="What's on your mind?"
+            className="grow bg-transparent outline-none"
+            type="text"
+            value={contentText}
+            onChange={(e) => setContentText(e.target.value)}
+            disabled={isPosting}
+          />
+          {!isPosting && Boolean(contentText) && (
+            <button
+              type="submit"
+              className="font-semibold"
+              onClick={handleSubmit}
+            >
+              Post
+            </button>
+          )}
+          {isPosting && <LoadingSpinner size={20} />}
+        </form>
       </div>
     );
   }
