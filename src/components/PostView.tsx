@@ -17,6 +17,7 @@ export const PostView = ({ post, author }: PostViewPropsType) => {
         className="rounded-full"
         width={48}
         height={48}
+        placeholder="blur"
       />
       <div className="flex flex-col gap-1">
         <div className="flex items-center gap-1">

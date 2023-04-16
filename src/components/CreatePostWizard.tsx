@@ -13,6 +13,7 @@ export const CreatePostWizard = () => {
           className="rounded-full"
           width={48}
           height={48}
+          placeholder="blur"
         />
         <input
           placeholder="What's on your mind?"
