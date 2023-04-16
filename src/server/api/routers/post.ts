@@ -8,7 +8,7 @@ import {
   privateProcedure,
   publicProcedure,
 } from "~/server/api/trpc";
-import { filterUserForClient } from "../helpers/filterUserForClient";
+import { addAuthorToPosts } from "../helpers/addAuthorToPosts";
 
 export const postsRouter = createTRPCRouter({
   getAll: publicProcedure.query(async ({ ctx }) => {
@@ -23,27 +23,7 @@ export const postsRouter = createTRPCRouter({
       ],
     });
 
-    const users = (
-      await clerkClient.users.getUserList({
-        userId: posts.map((post) => post.authorId),
-        limit,
-      })
-    ).map(filterUserForClient);
-
-    return posts.map((post) => {
-      const author = users.find((user) => user.id === post.authorId);
-
-      if (!author)
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: "Author not found",
-        });
-
-      return {
-        post,
-        author,
-      };
-    });
+    return addAuthorToPosts(posts);
   }),
   create: privateProcedure
     .input(
@@ -63,5 +43,50 @@ export const postsRouter = createTRPCRouter({
       });
 
       return post;
+    }),
+  getPostsByUserId: publicProcedure
+    .input(
+      z.object({
+        userId: z.string(),
+      })
+    )
+    .query(async ({ ctx, input }) => {
+      const { userId } = input;
+      const posts = await ctx.prisma.post.findMany({
+        where: {
+          authorId: userId,
+        },
+        take: 100,
+        orderBy: [
+          {
+            createdAt: "desc",
+          },
+        ],
+      });
+
+      return addAuthorToPosts(posts);
+    }),
+  getById: publicProcedure
+    .input(
+      z.object({
+        id: z.string(),
+      })
+    )
+    .query(async ({ ctx, input }) => {
+      const { id } = input;
+      const post = await ctx.prisma.post.findUnique({
+        where: {
+          id,
+        },
+      });
+
+      if (!post) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Post not found",
+        });
+      }
+
+      return (await addAuthorToPosts([post]))[0];
     }),
 });

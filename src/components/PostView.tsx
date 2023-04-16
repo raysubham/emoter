@@ -10,14 +10,16 @@ type PostViewPropsType = RouterOutputs["posts"]["getAll"][number];
 
 export const PostView = ({ post, author }: PostViewPropsType) => {
   return (
-    <div className="flex items-center gap-4 border-b border-slate-400 p-6">
-      <Image
-        src={author?.profileImageUrl}
-        alt="Profile Image"
-        className="rounded-full"
-        width={48}
-        height={48}
-      />
+    <div className="flex items-center gap-4 border-b border-slate-400 p-4">
+      <Link href={`/@${author.username || ""}`}>
+        <Image
+          src={author?.profileImageUrl}
+          alt="Profile Image"
+          className="rounded-full"
+          width={48}
+          height={48}
+        />
+      </Link>
       <div className="flex flex-col gap-1">
         <div className="flex items-center gap-1">
           <Link href={`/@${author.username || ""}`}>
