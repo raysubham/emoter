@@ -1,20 +1,22 @@
-import { type NextPage } from "next";
+import { GetStaticPaths, GetStaticProps, type NextPage } from "next";
 import Head from "next/head";
-import { useRouter } from "next/router";
 import { api } from "~/utils/api";
 import { PostView } from "~/components/PostView";
 import { LoadingSpinner } from "~/components/LoadingSpinner";
 import { PageLayout } from "../../components/PageLayout";
+import { generateServerSideHelper } from "~/server/api/helpers/generateServerSideHelper";
 
-const PostPage: NextPage = () => {
-  const router = useRouter();
-  const id = router.query?.id as string;
+const PostPage: NextPage<{ id: string }> = ({ id }) => {
+  const { data } = api.posts.getById.useQuery(
+    {
+      id,
+    },
+    {
+      refetchOnMount: false,
+    }
+  );
 
-  const { data, isLoading: isLoadingPost } = api.posts.getById.useQuery({
-    id,
-  });
-
-  if (isLoadingPost)
+  if (!data)
     return (
       <div className="h-screen">
         <LoadingSpinner size={60} />
@@ -36,6 +38,30 @@ const PostPage: NextPage = () => {
       </PageLayout>
     </>
   );
+};
+
+export const getStaticProps: GetStaticProps = async (context) => {
+  const trpcHelper = generateServerSideHelper();
+
+  const id = context.params?.id as string;
+
+  if (typeof id !== "string") throw new Error("no id");
+
+  await trpcHelper.posts.getById.prefetch({ id });
+
+  return {
+    props: {
+      trpcState: trpcHelper.dehydrate(),
+      id,
+    },
+  };
+};
+
+export const getStaticPaths: GetStaticPaths = () => {
+  return {
+    paths: [],
+    fallback: "blocking",
+  };
 };
 
 export default PostPage;
